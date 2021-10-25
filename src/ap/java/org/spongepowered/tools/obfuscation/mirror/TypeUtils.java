@@ -371,25 +371,8 @@ public abstract class TypeUtils {
      * @return descriptor
      */
     public static String getInternalName(TypeMirror type) {
-        switch (type.getKind()) {
-            case ARRAY:    return "[" + TypeUtils.getInternalName(((ArrayType)type).getComponentType());
-            case DECLARED: return "L" + TypeUtils.getInternalName((DeclaredType)type) + ";";
-            case TYPEVAR:  return "L" + TypeUtils.getInternalName(TypeUtils.getUpperBound(type)) + ";";
-            case BOOLEAN:  return "Z";
-            case BYTE:     return "B";
-            case CHAR:     return "C";
-            case DOUBLE:   return "D";
-            case FLOAT:    return "F";
-            case INT:      return "I";
-            case LONG:     return "J";
-            case SHORT:    return "S";
-            case VOID:     return "V";
-            // TODO figure out a better way to not crash when we get here
-            case ERROR:    return Constants.OBJECT_DESC;
-            default:
-        }
-
-        throw new IllegalArgumentException("Unable to parse type symbol " + type + " with " + type.getKind() + " to equivalent bytecode type");
+        String desc = DescVisitor.getDesc(type);
+        return desc.substring(1, desc.length()-1);
     }
 
     /**
