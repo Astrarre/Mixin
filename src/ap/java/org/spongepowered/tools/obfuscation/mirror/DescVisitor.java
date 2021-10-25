@@ -19,7 +19,6 @@ import javax.lang.model.util.AbstractTypeVisitor14;
 
 public class DescVisitor extends AbstractTypeVisitor14<Void, Void> {
 	StringBuilder desc = new StringBuilder();
-	Consumer<TypeMirror> errorConsumer = t -> System.err.println("unable to recognize " + t);
 
 	public static String getDesc(TypeMirror mirror) {
 		DescVisitor visitor = new DescVisitor();
@@ -40,18 +39,18 @@ public class DescVisitor extends AbstractTypeVisitor14<Void, Void> {
 	}
 
 	public static String getPrimitiveDesc(TypeKind t) {
-		return switch(t) {
-			case INT -> "I";
-			case BYTE -> "B";
-			case CHAR -> "C";
-			case LONG -> "J";
-			case VOID -> "V";
-			case FLOAT -> "F";
-			case SHORT -> "S";
-			case DOUBLE -> "D";
-			case BOOLEAN -> "Z";
-			default -> throw new UnsupportedOperationException("Unrecognized primitive type " + t);
-		};
+		switch(t) {
+			case INT: return "I";
+			case BYTE: return "B";
+			case CHAR: return "C";
+			case LONG: return "J";
+			case VOID: return "V";
+			case FLOAT: return "F";
+			case SHORT: return "S";
+			case DOUBLE: return "D";
+			case BOOLEAN: return "Z";
+			default: throw new UnsupportedOperationException("Unrecognized primitive type " + t);
+		}
 	}
 
 	@Override
@@ -75,7 +74,6 @@ public class DescVisitor extends AbstractTypeVisitor14<Void, Void> {
 
 	@Override
 	public Void visitError(ErrorType t, Void unused) {
-		this.errorConsumer.accept(t);
 		return null;
 	}
 
@@ -109,11 +107,18 @@ public class DescVisitor extends AbstractTypeVisitor14<Void, Void> {
 
 	@Override
 	public Void visitNoType(NoType t, Void unused) {
-		String desc = switch(t.getKind()) {
-			case NONE -> "Ljava/lang/Object;";
-			case PACKAGE, MODULE -> {this.errorConsumer.accept(t); yield "Ljava/lang/Object;";}
-			case VOID -> "V";
-			default -> throw new UnsupportedOperationException("Unrecognized type " + t);
+		String desc;
+		switch(t.getKind()) {
+			case NONE: 
+			case PACKAGE:
+			case MODULE: 
+				desc = "Ljava/lang/Object;";
+				break;
+			case VOID: 
+				desc = "V"; 
+				break;
+			default:
+				throw new UnsupportedOperationException("Unrecognized type " + t);
 		};
 		this.desc.append(desc);
 		return null;
